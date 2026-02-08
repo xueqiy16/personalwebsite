@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+  --background: #D8F0EC;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Calibri', 'Carlito', 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Prevent pull-to-refresh and overscroll on mobile */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: none;
+}
+
+/* Ensure the full viewport height on mobile Safari (accounts for address bar) */
+html, body, #__next {
+  height: 100%;
+  height: 100dvh;
+}
+
+/* Prevent text selection on the 3D canvas layer */
+canvas {
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}

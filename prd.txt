@@ -1,0 +1,224 @@
+# Refined PRD: Monument Valley-Inspired Personal Portfolio
+
+## 1. Vision and Concept
+
+A **3D isometric interactive portfolio website** inspired by the visual language of *Monument Valley*. The world is bright, sunny, and rendered in a **classic Monument Valley palette** (terracotta, teal, warm orange, dusty pink). The scene consists of a central architectural monument where:
+
+- The **top / center** of the monument houses an **About Me** section with bio and contact links.
+- Two distinct **doors / portals** on the monument lead to the main content areas:
+  - **Door A -- "My Beloved Arts"**: branches into Dance, Rhythmic Gymnastics, and Music.
+  - **Door B -- "My Projects"**: branches into Articles (Medium), X Posts, and Past Projects.
+
+The site will launch with **placeholder content** across all sections, to be replaced with real content over time.
+
+---
+
+## 2. Technical Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router) |
+| 3D Engine | React Three Fiber (R3F) + Three.js |
+| 3D Helpers | @react-three/drei (cameras, controls, primitives) |
+| Physics / Interaction | Raycasting (click detection on portals/doors) |
+| Styling | Tailwind CSS (for 2D UI overlays) |
+| UI Animation | Framer Motion (overlay entrance/exit transitions) |
+| 3D Animation | GSAP (camera fly / zoom transitions) |
+| State Management | Zustand (track current section, audio state, navigation history) |
+| Audio | Howler.js or Web Audio API (background music + interaction SFX) |
+| Deployment | Vercel |
+
+---
+
+## 3. Architecture and Scene Graph
+
+### 3.1 Isometric Camera
+
+- `OrthographicCamera` at a fixed position (e.g. `[10, 10, 10]`) looking at `[0, 0, 0]`.
+- On mobile: same 3D experience with camera zoomed out to fit the full monument on smaller viewports.
+
+### 3.2 World Grid
+
+- All architectural geometry follows a strict unit grid (1 unit = 1 block).
+- Low-poly geometry only: boxes, cylinders, arches, stairs. No imported high-poly models.
+
+### 3.3 Scene Graph Hierarchy
+
+```
+Canvas
+├── WorldContainer
+│   ├── OrthographicCamera
+│   ├── Lighting Setup
+│   ├── Monument Structure
+│   │   ├── About Me Zone (top)
+│   │   ├── Door A: My Beloved Arts
+│   │   │   ├── Dance
+│   │   │   ├── Rhythmic Gymnastics
+│   │   │   └── Music
+│   │   └── Door B: My Projects
+│   │       ├── Articles (Medium)
+│   │       ├── X Posts
+│   │       └── Past Projects
+│   └── AudioManager
+└── UIOverlay (2D React Layer)
+    ├── SplashScreen
+    ├── Section Content Overlay
+    └── Back Button
+```
+
+---
+
+## 4. User Flow
+
+### 4.1 Landing Experience
+
+1. User arrives at the site and sees a **splash screen** displaying your name / logo.
+2. Splash fades out and the 3D monument is revealed (camera is already in its default isometric position). A young girl is standing in the center.
+3. Background ambient music begins (with a mute/unmute toggle visible).
+
+### 4.2 Main View (Monument)
+
+- The full monument is visible in isometric perspective. There is a beautiful waterfall running down from the monument, with Calgary rocky mountains in the background and beautiful trees and flowers growing along the monument walls.
+- Two interactive doors glow subtly or have visual affordances (e.g. floating labels, slight animation).
+- The **top of the monument** has a small interactive zone for "About Me."
+- Hovering a door: mesh scales up slightly or emits a glow. Subtle hover SFX plays.
+- Clicking a door: The child walks to the door. GSAP-driven camera zoom/pan to focus on that door area.
+
+### 4.3 Sub-Section View
+
+- After zooming into a door, a **2D overlay** (animated in with Framer Motion) presents the sub-section choices:
+  - Door A: three paths -- Dance, Rhythmic Gymnastics, Music.
+  - Door B: three paths -- Articles, X Posts, Projects.
+- Clicking a path opens the **content overlay** for that sub-section.
+
+### 4.4 Content Overlays
+
+| Sub-Section | Content Format |
+|------------|---------------|
+| **Dance** | Mix of embedded videos, photo galleries, and text descriptions |
+| **Rhythmic Gymnastics** | Mix of embedded videos, photo galleries, and text descriptions |
+| **Music** | Mix of embedded videos, photo galleries, and text descriptions |
+| **Articles** | Cards with title, date, thumbnail, and "Read on Medium" button (external links) |
+| **X Posts** | Embedded X/Twitter posts (using Twitter embed API) |
+| **Past Projects** | Cards with thumbnail image (more detail fields like description, links can be added later) |
+
+### 4.5 About Me (Top of Monument)
+
+- Clicking the top/center zone of the monument opens an overlay with:
+  - Bio / personal introduction text.
+  - Contact information and social links (e.g. LinkedIn, GitHub, email, X).
+
+### 4.6 Back Navigation
+
+- A visible **"Back" or "X" button** appears on any overlay.
+- Clicking it closes the overlay (Framer Motion exit animation) and triggers a GSAP camera transition back to the default isometric view.
+- Child walks back to the center of the monument.
+- Navigation follows a simple stack: Main View -> Door View -> Content View, and "Back" pops one level.
+
+---
+
+## 5. Visual Aesthetic
+
+### 5.1 Color Palette (Monument Valley Classic)
+
+- **Primary surfaces**: Terracotta / warm orange (`#C2703E`, `#E8A87C`)
+- **Accent / secondary**: Teal (`#41B3A3`)
+- **Highlights**: Dusty pink (`#D4A5A5`)
+- **Background / sky**: Soft warm gradient or flat warm cream (`#FDF6EC`)
+- *Exact hex values are starting points -- to be refined during implementation.*
+
+### 5.2 Lighting
+
+- Single `DirectionalLight` (high intensity, casting soft shadows).
+- `AmbientLight` for fill.
+- No textures; flat-shaded `MeshStandardMaterial` or `MeshLambertMaterial` with the pastel palette.
+
+### 5.3 Geometry Style
+
+- Clean primitives: boxes, arches, stairs, cylinders.
+- All low-poly for performance.
+- Strict grid alignment.
+
+---
+
+## 6. Audio
+
+- **Background music**: Soft ambient instrumental music track that loops. Starts on site load after splash.
+- **Interaction SFX**: Subtle sounds on hover and click (door interactions, button clicks, transitions).
+- **Mute/unmute toggle**: Always visible in a corner of the screen.
+- Audio files will be placeholder/royalty-free to start.
+
+---
+
+## 7. Responsive Design (Mobile)
+
+- **Full 3D experience preserved on mobile** -- no 2D fallback.
+- Camera zoom adjusted (zoomed out further) so the full monument fits on smaller screens.
+- Touch events mapped to click events for door interactions.
+- UI overlays are responsive via Tailwind CSS (stacked layouts, adjusted font sizes).
+- Performance: keep geometry minimal, test on mid-range devices.
+
+---
+
+## 8. Implementation Roadmap
+
+### Phase 1: Foundation
+
+- Initialize Next.js 15 App Router project with Tailwind CSS.
+- Install dependencies: `three`, `@types/three`, `@react-three/fiber`, `@react-three/drei`, `gsap`, `framer-motion`, `zustand`, `howler`.
+- Set up the `Canvas` with `OrthographicCamera` in isometric position.
+- Create Zustand store for navigation state and audio state.
+
+### Phase 2: Monument Construction
+
+- Build the isometric monument geometry using drei primitives (`Box`, `Cylinder`, etc.).
+- Apply the Monument Valley color palette with flat-shaded materials.
+- Set up lighting (DirectionalLight + AmbientLight).
+- Set the background sky color/gradient.
+
+### Phase 3: Splash Screen
+
+- Create splash screen component (with my name: Xueqi Yang, fade animation).
+- Implement transition from splash to main 3D view.
+
+### Phase 4: Interactive Doors and Navigation
+
+- Create the `Portal` component (hover glow/scale, click handler).
+- Place two door portals and one "About Me" zone on the monument.
+- Implement GSAP camera transitions (zoom into door, return to default).
+- Add the "Back" button with return-to-default behavior.
+
+### Phase 5: Content Overlays
+
+- Build the overlay system with Framer Motion enter/exit animations.
+- Create sub-section selector view (3 paths per door).
+- Build content card components for each sub-section type:
+  - Media cards (video embeds, photos, text) for Arts.
+  - Medium article cards with external links.
+  - Embedded X/Twitter posts.
+  - Project thumbnail cards.
+- Build the About Me overlay (bio + social links).
+- Populate all sections with placeholder content.
+
+### Phase 6: Audio
+
+- Integrate Howler.js for background music and SFX.
+- Add mute/unmute toggle UI.
+- Wire up interaction SFX to hover/click events.
+
+### Phase 7: Polish and Responsive
+
+- Test and adjust mobile camera positioning.
+- Ensure all overlays are responsive.
+- Performance optimization (geometry, lazy loading, etc.).
+- Deploy to Vercel.
+
+---
+
+## 9. Key Constraints and Success Criteria
+
+- **Performance**: All 3D geometry must be low-poly. Target 60fps on desktop, 30fps+ on mobile.
+- **No textures**: Flat colors only, matching the Monument Valley aesthetic.
+- **Accessibility**: All interactive elements must have clear visual affordances. Overlays should be keyboard-navigable.
+- **State management**: Zustand store tracks current view, navigation history, and audio on/off.
+- **Placeholder-first**: Ship with placeholder content; real content will be swapped in iteratively.
