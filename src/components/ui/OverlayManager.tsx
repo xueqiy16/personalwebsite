@@ -701,11 +701,12 @@ function AboutMeContent() {
         <div className="flex flex-wrap gap-3 justify-center">
           {[
             { label: "LinkedIn", href: "https://www.linkedin.com/in/xueqi-yang-0b3489322/" },
-            { label: "GitHub", href: "https://github.com/xueqiy16" },
             { label: "Email", href: "mailto:xueqi.y16@gmail.com" },
+            { label: "X", href: "https://x.com/XueqiYang51572" },
             { label: "Medium", href: "https://medium.com/@xueqi.y16" },
             { label: "Instagram", href: "https://www.instagram.com/xqy0916/" },
-            { label: "X", href: "https://x.com/XueqiYang51572" },
+            { label: "GitHub", href: "https://github.com/xueqiy16" },
+            { label: "YouTube", href: "https://www.youtube.com/@XueqiYang/playlists" },
           ].map((link) => (
             <a
               key={link.label}
