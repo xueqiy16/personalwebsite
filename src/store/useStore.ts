@@ -28,6 +28,20 @@ interface StoreState {
   splashDone: boolean;
   setSplashDone: () => void;
 
+  // --- Ring rotation (0, 90, 180, 270) ---
+  ringRotation: number;
+  setRingRotation: (deg: number) => void;
+
+  // --- Character walking ---
+  walkPath: string[] | null;
+  setWalkPath: (path: string[] | null) => void;
+  isWalking: boolean;
+  setIsWalking: (v: boolean) => void;
+  characterNodeId: string;
+  setCharacterNodeId: (id: string) => void;
+  walkTarget: Section | null;
+  setWalkTarget: (section: Section | null) => void;
+
   // --- Audio ---
   isMuted: boolean;
   toggleMute: () => void;
@@ -63,6 +77,20 @@ export const useStore = create<StoreState>((set, get) => ({
   // --- Splash ---
   splashDone: false,
   setSplashDone: () => set({ splashDone: true }),
+
+  // --- Ring rotation ---
+  ringRotation: 0,
+  setRingRotation: (deg) => set({ ringRotation: ((deg % 360) + 360) % 360 }),
+
+  // --- Character walking ---
+  walkPath: null,
+  setWalkPath: (path) => set({ walkPath: path }),
+  isWalking: false,
+  setIsWalking: (v) => set({ isWalking: v }),
+  characterNodeId: "home",
+  setCharacterNodeId: (id) => set({ characterNodeId: id }),
+  walkTarget: null,
+  setWalkTarget: (section) => set({ walkTarget: section }),
 
   // --- Audio ---
   isMuted: false,

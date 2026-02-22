@@ -166,7 +166,7 @@ const ARTS_SLIDER_IMAGES = [
 const PROJECTS_SLIDER_IMAGES = [
   { src: "/projects/projects-1.jpg", alt: "Projects photo 1" },
   { src: "/projects/projects-2.jpg", alt: "Projects photo 2" },
-  { src: "/projects/projects-3.jpg", alt: "Projects photo 3" },
+  { src: "/projects/projects-3.jpg", alt: "Projects photo 3" }
 ];
 
 // =====================================================================

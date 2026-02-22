@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Html } from "@react-three/drei";
 import { useStore, type Section } from "@/store/useStore";
 import { audio } from "@/lib/audio";
+import { findPath, PORTAL_DEST } from "@/lib/pathfinding";
 
 interface PortalProps {
   /** Position in monument-space */
@@ -60,10 +61,16 @@ export default function Portal({
   externalUrl,
 }: PortalProps) {
   const [hovered, setHovered] = useState(false);
+  const [blocked, setBlocked] = useState(false);
   const navigateTo = useStore((s) => s.navigateTo);
   const currentSection = useStore((s) => s.currentSection);
   const splashDone = useStore((s) => s.splashDone);
   const setHoveredSection = useStore((s) => s.setHoveredSection);
+  const isWalking = useStore((s) => s.isWalking);
+  const characterNodeId = useStore((s) => s.characterNodeId);
+  const ringRotation = useStore((s) => s.ringRotation);
+  const setWalkPath = useStore((s) => s.setWalkPath);
+  const setWalkTarget = useStore((s) => s.setWalkTarget);
   const isMainView = currentSection === "main" && splashDone;
 
   // Randomise the animation delay per portal so they don't bob in sync
@@ -86,12 +93,33 @@ export default function Portal({
   };
 
   const handleClick = () => {
+    if (isWalking) return;
+
     audio.playClick();
+
     if (externalUrl) {
       window.open(externalUrl, "_blank", "noopener,noreferrer");
-    } else {
-      navigateTo(section);
+      document.body.style.cursor = "default";
+      setHovered(false);
+      return;
     }
+
+    const destNode = PORTAL_DEST[section];
+    if (!destNode) {
+      navigateTo(section);
+      return;
+    }
+
+    const path = findPath(characterNodeId, destNode, ringRotation);
+    if (path && path.length >= 2) {
+      setWalkTarget(section);
+      setWalkPath(path);
+    } else {
+      audio.playBlocked();
+      setBlocked(true);
+      setTimeout(() => setBlocked(false), 1200);
+    }
+
     document.body.style.cursor = "default";
     setHovered(false);
   };
@@ -147,7 +175,7 @@ export default function Portal({
               style={{
                 position: "relative",
                 zIndex: 1,
-                color: hovered ? "#5040A0" : "#7868B0",
+                color: blocked ? "#CC4444" : hovered ? "#5040A0" : "#7868B0",
                 fontSize: "13px",
                 fontWeight: 600,
                 letterSpacing: "0.12em",
@@ -158,7 +186,7 @@ export default function Portal({
                   : "0 1px 2px rgba(255,255,255,0.6)",
               }}
             >
-              {label}
+              {blocked ? "Rotate the ring!" : label}
             </span>
           </div>
         </div>

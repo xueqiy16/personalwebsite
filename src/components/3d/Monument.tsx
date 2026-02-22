@@ -1,5 +1,8 @@
 "use client";
 
+import RotatableRing from "./RotatableRing";
+import Stairs from "./Stairs";
+
 // ===== White-Glow Palette =====
 const C = {
   white: "#99CBFF", // base walls
@@ -248,89 +251,14 @@ export default function Monument() {
       </mesh>
 
       {/* ===================================================
-          LAYER 2 — MIDDLE SECTION  (Y ~4.3 → 6.65)
+          LAYER 2 — ROTATABLE MIDDLE RING  (Y ~4.3 → 6.65)
           =================================================== */}
+      <RotatableRing />
 
-      {/* Core block */}
-      <mesh position={[0, 5.45, 0]}>
-        <boxGeometry args={[3.8, 2.3, 3.8]} />
-        <meshStandardMaterial color={C.warmWhite} {...G} />
-      </mesh>
-
-      {/* Teal accent block on +Z face */}
-      <mesh position={[-1.1, 5.2, 2.1]}>
-        <boxGeometry args={[1.2, 1.6, 0.6]} />
-        <meshStandardMaterial color={C.teal} {...G} />
-      </mesh>
-
-      {/* Teal accent block on +X face */}
-      <mesh position={[2.1, 5.2, -1.1]}>
-        <boxGeometry args={[0.6, 1.6, 1.2]} />
-        <meshStandardMaterial color={C.teal} {...G} />
-      </mesh>
-
-      {/* Small teal block on +X face (lower) */}
-      <mesh position={[2.0, 4.8, 1.2]}>
-        <boxGeometry args={[0.5, 0.8, 0.8]} />
-        <meshStandardMaterial color={C.tealLight} {...G} />
-      </mesh>
-
-      {/* Decorative circles on +Z face */}
-      {[
-        { x: 0.8, y: 5.6 },
-        { x: 0.8, y: 4.8 },
-      ].map((c, i) => (
-        <mesh
-          key={`cz-${i}`}
-          position={[c.x, c.y, 1.92]}
-          rotation={[Math.PI / 2, 0, 0]}
-        >
-          <cylinderGeometry args={[0.25, 0.25, 0.06, 12]} />
-          <meshStandardMaterial color={C.deep} />
-        </mesh>
-      ))}
-
-      {/* Decorative circles on +X face */}
-      {[
-        { z: 0.8, y: 5.6 },
-        { z: 0.8, y: 4.8 },
-      ].map((c, i) => (
-        <mesh
-          key={`cx-${i}`}
-          position={[1.92, c.y, c.z]}
-          rotation={[0, 0, Math.PI / 2]}
-        >
-          <cylinderGeometry args={[0.25, 0.25, 0.06, 12]} />
-          <meshStandardMaterial color={C.deep} />
-        </mesh>
-      ))}
-
-      {/* Windows on middle section */}
-      <mesh position={[1.5, 6.0, 1.92]}>
-        <boxGeometry args={[0.45, 0.65, 0.06]} />
-        <meshStandardMaterial color={C.deep} />
-      </mesh>
-      <mesh position={[1.92, 6.0, 1.5]}>
-        <boxGeometry args={[0.06, 0.65, 0.45]} />
-        <meshStandardMaterial color={C.deep} />
-      </mesh>
-
-      {/* Walkway extending from +Z face */}
-      <mesh position={[0, 5.3, 2.7]}>
-        <boxGeometry args={[1.4, 0.12, 1.0]} />
-        <meshStandardMaterial color={C.accent} {...G} />
-      </mesh>
-      {/* Walkway railing */}
-      <mesh position={[0, 5.6, 3.15]}>
-        <boxGeometry args={[1.4, 0.5, 0.06]} />
-        <meshStandardMaterial color={C.platform} {...G} />
-      </mesh>
-
-      {/* Small walkway on +X face */}
-      <mesh position={[2.7, 5.8, 0]}>
-        <boxGeometry args={[1.0, 0.12, 1.2]} />
-        <meshStandardMaterial color={C.accent} {...G} />
-      </mesh>
+      {/* ===================================================
+          EXTERIOR STAIRCASES
+          =================================================== */}
+      <Stairs />
 
       {/* ===================================================
           TRANSITION LEDGE (middle → terrace)
@@ -376,31 +304,10 @@ export default function Monument() {
         <meshStandardMaterial color={C.platform} {...G} />
       </mesh>
 
-      {/* ---- Potted tree ---- */}
-      <mesh position={[0, 7.15, 0]}>
-        <boxGeometry args={[0.65, 0.3, 0.65]} />
-        <meshStandardMaterial color={C.teal} {...G} />
-      </mesh>
-      <mesh position={[0, 7.6, 0]}>
-        <cylinderGeometry args={[0.04, 0.06, 0.6, 6]} />
-        <meshStandardMaterial color="#8B7060" />
-      </mesh>
-      <mesh position={[0, 8.05, 0]}>
-        <sphereGeometry args={[0.42, 10, 10]} />
-        <meshStandardMaterial color="#90D8A8" emissive="#ffffff" emissiveIntensity={0.1} />
-      </mesh>
-      {/* Reeds / tall grass */}
-      <mesh position={[0.35, 7.55, 0.15]}>
-        <cylinderGeometry args={[0.015, 0.015, 0.8, 4]} />
-        <meshStandardMaterial color="#A0B878" />
-      </mesh>
-      <mesh position={[0.25, 7.45, -0.2]}>
-        <cylinderGeometry args={[0.015, 0.015, 0.6, 4]} />
-        <meshStandardMaterial color={C.gold} />
-      </mesh>
-      <mesh position={[-0.3, 7.5, 0.25]}>
-        <cylinderGeometry args={[0.015, 0.015, 0.7, 4]} />
-        <meshStandardMaterial color="#A0B878" />
+      {/* ---- Home marker tile ---- */}
+      <mesh position={[0, 7.01, 0]}>
+        <cylinderGeometry args={[0.35, 0.35, 0.02, 16]} />
+        <meshStandardMaterial color={C.accent} emissive="#ffffff" emissiveIntensity={0.15} />
       </mesh>
 
       {/* ===================================================

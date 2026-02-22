@@ -179,6 +179,107 @@ function Stars() {
   );
 }
 
+// ===== Shooting stars — periodic streaks across the sky =====
+
+const NUM_SHOOTING = 5;
+
+interface ShootingStar {
+  start: [number, number, number];
+  dir: [number, number, number];
+  speed: number;
+  interval: number;
+  offset: number;
+  trailLen: number;
+}
+
+// Positions are relative to the scene group (which sits at y = -5.5).
+// The camera sees roughly ±12 units from origin, so keep starts within view.
+const shootingData: ShootingStar[] = [
+  { start: [-8, 10, -4], dir: [0.8, -0.45, 0.35], speed: 14, interval: 6, offset: 0, trailLen: 3.0 },
+  { start: [7, 12, 3], dir: [-0.7, -0.55, -0.25], speed: 16, interval: 8, offset: 2.5, trailLen: 3.5 },
+  { start: [4, 14, -6], dir: [-0.35, -0.65, 0.45], speed: 12, interval: 10, offset: 5, trailLen: 2.8 },
+  { start: [-6, 8, 5], dir: [0.65, -0.5, -0.35], speed: 15, interval: 7, offset: 3.5, trailLen: 3.2 },
+  { start: [1, 16, -5], dir: [0.4, -0.75, 0.25], speed: 18, interval: 12, offset: 7, trailLen: 4.0 },
+];
+
+// Pre-compute normalised direction vectors and quaternions
+const shootingDirVecs = shootingData.map((d) =>
+  new THREE.Vector3(d.dir[0], d.dir[1], d.dir[2]).normalize(),
+);
+const Y_UP = new THREE.Vector3(0, 1, 0);
+
+function ShootingStars() {
+  const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
+
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+
+    for (let i = 0; i < NUM_SHOOTING; i++) {
+      const mesh = meshRefs.current[i];
+      if (!mesh) continue;
+
+      const d = shootingData[i];
+      const cycle = ((t + d.offset) % d.interval) / d.interval;
+
+      // Active during the first 18% of each cycle
+      const active = cycle < 0.18;
+      const localT = cycle / 0.18;
+
+      if (active) {
+        const dist = localT * d.speed;
+        mesh.position.set(
+          d.start[0] + d.dir[0] * dist,
+          d.start[1] + d.dir[1] * dist,
+          d.start[2] + d.dir[2] * dist,
+        );
+
+        // Fade in then out
+        const fade = localT < 0.25
+          ? localT / 0.25
+          : 1 - (localT - 0.25) / 0.75;
+
+        const mat = mesh.material as THREE.MeshStandardMaterial;
+        mat.opacity = fade * 0.95;
+        mat.emissiveIntensity = 1.0 + fade * 1.5;
+
+        // Scale: cylinder height (Y) = trail length, radius (X/Z) = thickness
+        const len = d.trailLen * Math.max(fade, 0.15);
+        mesh.scale.set(0.12, len, 0.12);
+
+        // Align the cylinder's Y axis with the travel direction
+        mesh.quaternion.setFromUnitVectors(Y_UP, shootingDirVecs[i]);
+
+        mesh.visible = true;
+      } else {
+        mesh.visible = false;
+      }
+    }
+  });
+
+  return (
+    <group>
+      {shootingData.map((_, i) => (
+        <mesh
+          key={`shooting-${i}`}
+          ref={(el) => { meshRefs.current[i] = el; }}
+          visible={false}
+        >
+          {/* Tapered cylinder: thin head (0.01) → wider tail (0.1), height 1 (scaled at runtime) */}
+          <cylinderGeometry args={[0.01, 0.1, 1, 6]} />
+          <meshStandardMaterial
+            color="#FFFFFF"
+            transparent
+            opacity={0}
+            depthWrite={false}
+            emissive="#FFFFFF"
+            emissiveIntensity={2.0}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 // ===== Cloud placement data =====
 const clouds: { pos: [number, number, number]; scale: number }[] = [
   // Large base clouds — monument "sits" on these
@@ -221,6 +322,7 @@ export default function Environment() {
         />
       ))}
       <Stars />
+      <ShootingStars />
     </group>
   );
 }
