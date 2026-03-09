@@ -13,6 +13,7 @@ import BackpropDemo from "./_components/BackpropDemo";
 import TrainingSimulator from "./_components/TrainingSimulator";
 import AnimatedWaveforms from "./_components/AnimatedWaveforms";
 import ConfettiBanner from "./_components/ConfettiBanner";
+import CodeToggle from "./_components/CodeToggle";
 
 export const metadata = {
   title: "EEGNet — Signal Processing Documentation",
@@ -72,10 +73,45 @@ export default function EEGNetPage() {
             This ensures the model cannot achieve high accuracy by simply
             predicting the majority class.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>generate_eeg_trial()</code>,{" "}
-            <code>generate_batch()</code>
-          </p>
+          <CodeToggle
+            label="generate_eeg_trial(), generate_batch()"
+            code={`def generate_eeg_trial(has_p300=True, n_channels=8, n_time=100, noise_std=0.2):
+    """Generate a single EEG trial with or without a P300 signal."""
+    data = np.random.normal(0, noise_std, (n_channels, n_time))
+
+    if has_p300:
+        p300_onset = 40
+        p300_length = len(P300_TEMPLATE)
+        p300_amplitude = 1.5
+
+        # Embed P300 in Pz (index 4) - primary P300 location
+        data[4, p300_onset:p300_onset + p300_length] += P300_TEMPLATE * p300_amplitude
+
+        # Embed P300 in Oz (index 7) - secondary P300 location (slightly weaker)
+        data[7, p300_onset:p300_onset + p300_length] += P300_TEMPLATE * p300_amplitude * 0.8
+
+    return data
+
+
+def generate_batch(batch_size=32, n_channels=8, n_time=100):
+    """Generate a balanced batch of EEG trials for training."""
+    X = np.zeros((batch_size, n_channels, n_time))
+    y = np.zeros(batch_size, dtype=int)
+
+    # First half: Hit trials (P300 present)
+    for i in range(batch_size // 2):
+        X[i] = generate_eeg_trial(has_p300=True, n_channels=n_channels, n_time=n_time)
+        y[i] = 1
+
+    # Second half: No-Hit trials (noise only)
+    for i in range(batch_size // 2, batch_size):
+        X[i] = generate_eeg_trial(has_p300=False, n_channels=n_channels, n_time=n_time)
+        y[i] = 0
+
+    # Shuffle the batch
+    perm = np.random.permutation(batch_size)
+    return X[perm], y[perm]`}
+          />
           <TrialGenerator />
         </NarrativeSection>
 
@@ -89,14 +125,25 @@ export default function EEGNetPage() {
             normalization: subtract the mean and divide by the standard
             deviation. Now we apply this z-score normalization to ensure that all trials have zero mean and variance of 1,
             which prevents large-amplitude noise from dominating the gradient
-            updates. Clarifying, the normalization process scales all input features equally,
-            ensuring that sudden, high-voltage artifacts (i.e. eye blinks or muscle twitches) do not disproportionately skew
+            updates. Just to clarify, the normalization process scales all input features equally,
+            which ensures that sudden, high-voltage artifacts (i.e. eye blinks or muscle twitches) do not disproportionately skew
             the network's weights to one direction. A small &epsilon; is added to the denominator for numerical
             stability.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>z_score_normalize()</code>
-          </p>
+          <CodeToggle
+            label="z_score_normalize()"
+            code={`def z_score_normalize(x, epsilon=1e-6):
+    """
+    Apply global z-score normalization.
+
+    This normalizes the entire input to have zero mean and unit variance,
+    preserving the relative shape of patterns across channels.
+    """
+    mean = x.mean()
+    std = x.std()
+    x_norm = (x - mean) / (std + epsilon)
+    return x_norm, mean, std`}
+          />
           <NormalizationDemo />
         </NarrativeSection>
 
@@ -112,9 +159,34 @@ export default function EEGNetPage() {
             each block to see its weight shape and output dimensions; click to
             jump to that section.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>EEGNet.__init__()</code>
-          </p>
+          <CodeToggle
+            label="EEGNet.__init__()"
+            code={`class EEGNet:
+    """EEGNet-inspired architecture for P300 detection."""
+
+    def __init__(self, n_channels=8, n_time=100, kernel_size=5, pool_size=4):
+        self.n_channels = n_channels
+        self.n_time = n_time
+        self.kernel_size = kernel_size
+        self.pool_size = pool_size
+
+        # Compute dimensions through the network
+        self.temporal_out_len = n_time - kernel_size + 1  # After temporal conv
+        self.pooled_len = self.temporal_out_len // pool_size  # After pooling
+
+        # LAYER 1: Temporal Convolution
+        # A single kernel shared across all channels to detect time patterns
+        self.temp_kernel = np.random.randn(kernel_size) * 0.1
+
+        # LAYER 2: Spatial Convolution (Depthwise)
+        # Learns which electrode locations are informative
+        self.spat_weights = np.random.randn(n_channels) * np.sqrt(2.0 / n_channels)
+
+        # LAYER 3: Fully Connected Classification
+        # Maps pooled features to 2 classes (No-Hit, Hit)
+        self.fc_weights = np.random.randn(2, self.pooled_len) * np.sqrt(2.0 / self.pooled_len)
+        self.fc_bias = np.zeros(2)`}
+          />
           <ArchitectureDiagram />
         </NarrativeSection>
 
@@ -135,9 +207,25 @@ export default function EEGNetPage() {
             channel. Notice how the output peaks when the kernel aligns with the
             P300 peak around sample 40.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>forward()</code> Stage 1
-          </p>
+          <CodeToggle
+            label="forward() — Stage 1: Temporal Convolution"
+            code={`# Inside EEGNet.forward():
+
+# Store input for backward pass
+self.input = x
+
+# STAGE 1: Temporal Convolution
+# Slides the kernel across time for each channel independently
+# Output shape: (n_channels, temporal_out_len)
+self.temp_out = np.zeros((self.n_channels, self.temporal_out_len))
+
+for c in range(self.n_channels):
+    for t in range(self.temporal_out_len):
+        # Extract window of input at time t
+        window = x[c, t:t + self.kernel_size]
+        # Dot product with kernel (no bias)
+        self.temp_out[c, t] = np.sum(window * self.temp_kernel)`}
+          />
           <TemporalConvDemo />
         </NarrativeSection>
 
@@ -156,10 +244,19 @@ export default function EEGNetPage() {
             change the combined output. Click &ldquo;Learned weights&rdquo; to
             see the trained model&rsquo;s solution.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>forward()</code> Stage 2,{" "}
-            <code>spat_weights</code>
-          </p>
+          <CodeToggle
+            label="forward() — Stage 2: Spatial Convolution"
+            code={`# Inside EEGNet.forward() (continued):
+
+# STAGE 2: Spatial Convolution
+# Weighted sum across channels at each time point
+# Output shape: (temporal_out_len,)
+self.spat_out = np.zeros(self.temporal_out_len)
+
+for t in range(self.temporal_out_len):
+    # Weighted combination of all channels at time t
+    self.spat_out[t] = np.sum(self.temp_out[:, t] * self.spat_weights)`}
+          />
           <SpatialConvDemo />
         </NarrativeSection>
 
@@ -199,10 +296,38 @@ export default function EEGNetPage() {
             mean. This reduces 96 time points to 96 / 4 = 24 time points, which captures the essential
             trend while discarding noise. This is a common technique in time-series data analysis to reduce dimensionality and improve computational efficiency.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>elu()</code>, <code>elu_derivative()</code>,{" "}
-            <code>forward()</code> Stages 3–4
-          </p>
+          <CodeToggle
+            label="elu(), elu_derivative(), forward() Stages 3–4"
+            code={`def elu(self, x, alpha=1.0):
+    """
+    Exponential Linear Unit activation.
+    ELU(x) = x if x > 0, else alpha * (exp(x) - 1)
+    """
+    return np.where(x > 0, x, alpha * (np.exp(x) - 1))
+
+def elu_derivative(self, x, alpha=1.0):
+    """
+    Derivative of ELU for backpropagation.
+    d/dx ELU(x) = 1 if x > 0, else alpha * exp(x)
+    """
+    return np.where(x > 0, 1.0, alpha * np.exp(x))
+
+
+# Inside EEGNet.forward() (continued):
+
+# STAGE 3: ELU Activation
+self.elu_out = self.elu(self.spat_out)
+
+# STAGE 4: Average Pooling
+# Reduces temporal dimension by averaging over windows
+# Output shape: (pooled_len,)
+self.pool_out = np.zeros(self.pooled_len)
+
+for i in range(self.pooled_len):
+    start = i * self.pool_size
+    end = start + self.pool_size
+    self.pool_out[i] = np.mean(self.elu_out[start:end])`}
+          />
           <EluPoolDemo />
         </NarrativeSection>
 
@@ -233,10 +358,36 @@ export default function EEGNetPage() {
             confident and correct, loss is near zero; when confident and wrong,
             loss spikes toward infinity.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>softmax()</code>,{" "}
-            <code>cross_entropy_loss()</code>, <code>forward()</code> Stage 5
-          </p>
+          <CodeToggle
+            label="softmax(), cross_entropy_loss(), forward() Stage 5"
+            code={`def softmax(self, x):
+    """
+    Softmax function for classification output.
+    Converts logits to probabilities that sum to 1.
+    """
+    # Subtract max for numerical stability (prevents overflow)
+    exp_x = np.exp(x - np.max(x))
+    return exp_x / np.sum(exp_x)
+
+
+def cross_entropy_loss(probs, target_label):
+    """
+    Compute cross-entropy loss for a single sample.
+    Loss = -log(probability of correct class)
+    """
+    # Clip to avoid log(0)
+    prob = np.clip(probs[target_label], 1e-15, 1.0 - 1e-15)
+    return -np.log(prob)
+
+
+# Inside EEGNet.forward() (continued):
+
+# STAGE 5: Fully Connected + Softmax
+self.logits = np.dot(self.fc_weights, self.pool_out) + self.fc_bias
+self.probs = self.softmax(self.logits)
+
+return self.probs`}
+          />
           <ClassificationDemo />
         </NarrativeSection>
 
@@ -294,9 +445,62 @@ export default function EEGNetPage() {
             from right to left — from the loss, all the way back to the
             temporal kernel.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>backward()</code>, <code>update_weights()</code>
-          </p>
+          <CodeToggle
+            label="backward(), update_weights()"
+            code={`def backward(self, target_label):
+    """Backward pass: compute gradients for all parameters."""
+
+    # GRADIENT OF CROSS-ENTROPY LOSS w.r.t. LOGITS
+    # For softmax + cross-entropy: dL/dz = probs - one_hot(target)
+    d_logits = self.probs.copy()
+    d_logits[target_label] -= 1.0
+
+    # GRADIENT OF FC LAYER
+    d_fc_weights = np.outer(d_logits, self.pool_out)
+    d_fc_bias = d_logits.copy()
+    d_pool_out = np.dot(self.fc_weights.T, d_logits)
+
+    # GRADIENT THROUGH AVERAGE POOLING
+    d_elu_out = np.zeros(self.temporal_out_len)
+    for i in range(self.pooled_len):
+        start = i * self.pool_size
+        end = start + self.pool_size
+        d_elu_out[start:end] = d_pool_out[i] / self.pool_size
+
+    # GRADIENT THROUGH ELU ACTIVATION
+    d_spat_out = d_elu_out * self.elu_derivative(self.spat_out)
+
+    # GRADIENT OF SPATIAL CONVOLUTION
+    d_spat_weights = np.zeros(self.n_channels)
+    d_temp_out = np.zeros((self.n_channels, self.temporal_out_len))
+    for c in range(self.n_channels):
+        for t in range(self.temporal_out_len):
+            d_spat_weights[c] += d_spat_out[t] * self.temp_out[c, t]
+            d_temp_out[c, t] = d_spat_out[t] * self.spat_weights[c]
+
+    # GRADIENT OF TEMPORAL CONVOLUTION KERNEL (CRITICAL)
+    # dL/d_kernel[k] = sum_{c,t} dL/d_temp_out[c,t] * input[c, t+k]
+    d_temp_kernel = np.zeros(self.kernel_size)
+    for k in range(self.kernel_size):
+        for c in range(self.n_channels):
+            for t in range(self.temporal_out_len):
+                d_temp_kernel[k] += d_temp_out[c, t] * self.input[c, t + k]
+
+    return {
+        'temp_kernel': d_temp_kernel,
+        'spat_weights': d_spat_weights,
+        'fc_weights': d_fc_weights,
+        'fc_bias': d_fc_bias
+    }
+
+
+def update_weights(self, gradients, learning_rate):
+    """Update all weights using computed gradients."""
+    self.temp_kernel -= learning_rate * gradients['temp_kernel']
+    self.spat_weights -= learning_rate * gradients['spat_weights']
+    self.fc_weights -= learning_rate * gradients['fc_weights']
+    self.fc_bias -= learning_rate * gradients['fc_bias']`}
+          />
           <BackpropDemo />
         </NarrativeSection>
 
@@ -316,11 +520,78 @@ export default function EEGNetPage() {
             to the P300 bump shape. The spatial weights should peak at Pz
             and Oz.
           </p>
-          <p className="text-neutral-500 text-sm italic mb-4">
-            Covers: <code>train_eegnet()</code>,{" "}
-            <code>cosine_similarity()</code>,{" "}
-            <code>plot_training_results()</code>
-          </p>
+          <CodeToggle
+            label="train_eegnet(), cosine_similarity()"
+            code={`def cosine_similarity(a, b):
+    """
+    Compute cosine similarity between two vectors.
+    A value of 1.0 means perfect alignment, -1.0 means opposite.
+    """
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a < 1e-8 or norm_b < 1e-8:
+        return 0.0
+    return np.dot(a, b) / (norm_a * norm_b)
+
+
+def train_eegnet(epochs=2000, batch_size=32, learning_rate=0.005):
+    """Train the EEGNet model on synthetic P300 data."""
+
+    model = EEGNet(n_channels=8, n_time=100, kernel_size=5, pool_size=4)
+    initial_kernel = model.temp_kernel.copy()
+    history = {'loss': [], 'accuracy': [], 'kernel_similarity': []}
+
+    for epoch in range(epochs):
+        X_batch, y_batch = generate_batch(batch_size=batch_size)
+
+        batch_gradients = {
+            'temp_kernel': np.zeros_like(model.temp_kernel),
+            'spat_weights': np.zeros_like(model.spat_weights),
+            'fc_weights': np.zeros_like(model.fc_weights),
+            'fc_bias': np.zeros_like(model.fc_bias)
+        }
+        batch_loss = 0.0
+        batch_correct = 0
+
+        for i in range(batch_size):
+            x = X_batch[i]
+            y = y_batch[i]
+
+            x_norm, _, _ = z_score_normalize(x)
+            probs = model.forward(x_norm, training=True)
+            loss = cross_entropy_loss(probs, y)
+            batch_loss += loss
+
+            prediction = np.argmax(probs)
+            if prediction == y:
+                batch_correct += 1
+
+            gradients = model.backward(y)
+
+            # Regularization: encourage kernel to match P300 template
+            kernel_norm = model.temp_kernel / (np.linalg.norm(model.temp_kernel) + 1e-8)
+            template_norm = P300_TEMPLATE / (np.linalg.norm(P300_TEMPLATE) + 1e-8)
+            reg_lambda = 0.1
+            gradients['temp_kernel'] += reg_lambda * (kernel_norm - template_norm)
+
+            for key in batch_gradients:
+                batch_gradients[key] += gradients[key]
+
+        # Average gradients and update weights
+        for key in batch_gradients:
+            batch_gradients[key] /= batch_size
+        model.update_weights(batch_gradients, learning_rate)
+
+        avg_loss = batch_loss / batch_size
+        accuracy = batch_correct / batch_size
+        kernel_sim = cosine_similarity(model.temp_kernel, P300_TEMPLATE)
+
+        history['loss'].append(avg_loss)
+        history['accuracy'].append(accuracy)
+        history['kernel_similarity'].append(kernel_sim)
+
+    return model, history, initial_kernel`}
+          />
           <TrainingSimulator />
         </NarrativeSection>
 

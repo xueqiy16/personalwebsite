@@ -225,7 +225,7 @@ export default function InteractiveHeader() {
         </h1>
         <p className="text-base sm:text-lg leading-relaxed text-slate-500 max-w-2xl mx-auto">
           The purpose of this article is to investigate how the EEGNet convolutional neural network works.
-          The <a href="https://github.com/xueqiy16/eegnet-/tree/main" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 pointer-events-auto">corresponding code</a> for this project will be explained in a fun, interactive, step-by-step methodology.
+          The <a href="https://github.com/xueqiy16/eegnet-/tree/main" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 pointer-events-auto">corresponding code</a> for this project will be explained in an interactive, step-by-step methodology.
           This implementation was created to be educational and fun.
         </p>
       </div>
