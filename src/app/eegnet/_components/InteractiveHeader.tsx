@@ -3,9 +3,9 @@
 import { useRef, useEffect, useCallback } from "react";
 
 // ── Configuration ────────────────────────────────────────────────
-const PARTICLE_COUNT = 90;
-const CONNECT_DIST = 120;
-const CURSOR_RADIUS = 180;
+const PARTICLE_COUNT = 50;
+const CONNECT_DIST = 100;
+const CURSOR_RADIUS = 160;
 const GRAVITY_STRENGTH = 0.012;
 const BASE_SPEED = 0.3;
 const MAGENTA: [number, number, number] = [232, 28, 255]; // #e81cff
@@ -69,7 +69,7 @@ export default function InteractiveHeader() {
       cvs!.width = rect.width * dpr;
       cvs!.height = rect.height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (particles.current.length === 0) seed(rect.width, rect.height);
+      seed(rect.width, rect.height);
     }
 
     resize();
@@ -207,7 +207,7 @@ export default function InteractiveHeader() {
 
   return (
     <header
-      className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden"
+      className="relative w-full min-h-[50vh] flex items-center justify-center overflow-hidden"
       style={{ background: "#fafafa" }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -221,14 +221,12 @@ export default function InteractiveHeader() {
       {/* Text overlay — pointer-events-none so canvas interactions work */}
       <div className="relative z-10 pointer-events-none max-w-3xl px-6 md:px-12 text-center">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight text-slate-900 mb-6">
-          Understanding EEGNet from Scratch: A NumPy-only implementation for P300
-          detection
+          Understanding EEGNet: A NumPy-only implementation for P300 ERP detection
         </h1>
         <p className="text-base sm:text-lg leading-relaxed text-slate-500 max-w-2xl mx-auto">
-          This implementation is designed to be educational and mathematically
-          correct. It demonstrates how a convolutional neural network learns to
-          detect Event-Related Potentials (ERPs) like the P300 from
-          multi-channel EEG data.
+          The purpose of this article is to investigate how the EEGNet convolutional neural network works.
+          The <a href="https://github.com/xueqiy16/eegnet-/tree/main" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 pointer-events-auto">corresponding code</a> for this project will be explained in a fun, interactive, step-by-step methodology.
+          This implementation was created to be educational and fun.
         </p>
       </div>
     </header>
