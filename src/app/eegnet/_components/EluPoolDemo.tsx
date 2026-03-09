@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { PALETTE } from "./constants";
+import { PALETTE, seededRandom } from "./constants";
 
 function elu(x: number, alpha: number): number {
   return x > 0 ? x : alpha * (Math.exp(x) - 1);
 }
 
 const SAMPLE_INPUT = (() => {
+  const rng = seededRandom(123);
   const pts: number[] = [];
   for (let i = 0; i < 96; i++) {
-    pts.push(Math.sin(i * 0.15) * 0.8 + (Math.random() - 0.5) * 0.3 - 0.1);
+    pts.push(Math.sin(i * 0.15) * 0.8 + (rng() - 0.5) * 0.3 - 0.1);
   }
   return pts;
 })();

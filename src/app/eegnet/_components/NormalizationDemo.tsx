@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { PALETTE, generateTrial, zScoreNormalize } from "./constants";
+import { PALETTE, generateTrial, zScoreNormalize, seededRandom } from "./constants";
 
 function WaveformPlot({
   data,
@@ -54,7 +54,7 @@ export default function NormalizationDemo() {
   const [seed, setSeed] = useState(42);
 
   const { raw, norm, mean, std } = useMemo(() => {
-    const trial = generateTrial(true, 8, 100, noiseStd);
+    const trial = generateTrial(true, 8, 100, noiseStd, seededRandom(seed));
     const pzRaw = trial[4];
     const { normalized, mean, std } = zScoreNormalize(trial);
     return { raw: pzRaw, norm: normalized[4], mean, std };

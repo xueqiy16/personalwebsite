@@ -329,8 +329,7 @@ export default function EEGNetPage() {
             🎉 You made it!
           </div>
           <p className="text-neutral-700 leading-relaxed max-w-lg mx-auto">
-            Congratulations, you have finished exploring the entire EEGNet architecture! You now understand
-            every layer of a neural network that reads minds.
+            Congratulations, you have finished exploring the entire EEGNet architecture! That was a great journey, wasn't it?
           </p>
         </ConfettiBanner>
 

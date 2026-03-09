@@ -41,7 +41,7 @@ export default function Home() {
   }, [setSplashDone]);
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden" style={{ height: "100dvh" }}>
+    <main className="relative w-screen h-screen overflow-hidden" style={{ height: "100dvh", touchAction: "none", overscrollBehavior: "none" }}>
       {/* 3D Canvas — always mounted so it pre-loads while splash is showing */}
       <Scene />
 
