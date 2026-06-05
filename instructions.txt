@@ -1,0 +1,10 @@
+-- VIEW UPDATED WEBSITE VIA LOCALHOST:3000 --
+1. Change code
+2. In terminal, type "cd ~/Documents/Extracurriculars/personalwebsite" and "npm run dev"
+3. Open "http://localhost:3000" on web
+
+-- PUSH UPDATES TO GITHUB --
+1. cd ~/Documents/Extracurriculars/personalwebsite
+2. git add .
+3. git commit -m "describe your changes here"
+4. git push
