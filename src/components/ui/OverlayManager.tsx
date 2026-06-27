@@ -642,16 +642,11 @@ function AboutMeContent() {
             className="text-sm leading-relaxed"
             style={{ color: "#584888" }}
           >
-            Hi! I&apos;m Xueqi, a first-year Engineering Science undergrad @UofT, passionate about innovating and driving human potential with emerging tech! My research interests are in brain-computer interfaces (imagining its potential to visualize dreams and memories💭) and longevity, though life philosophy also seems fascinating.
+            Hi! I&apos;m Xueqi, a 2nd-year Engineering Science undergrad @UofT, passionate about innovating and driving human potential with emerging tech! My research interests 
+            are in brain-computer interfaces (inspire play and adventure) and machine learning. Neuroethical philosophy is also fascinating.
             <br />
             <br />
-            Where am I right now? On the pathway to becoming the best version of myself.
-            <br />
-            <br />
-            Outside of academia, I&apos;m a pretty artsy person. I love piano and Chinese dance @DY Dance Studio. I used to be a national senior competitive rhythmic gymnast @Vertigo Rhythmic Gymnastics Club.
-            <br />
-            <br />
-            In the past, I was extremely passionate in biometrics🧬. Through TKS, I have consulted with companies such as IKEA and Samsung.
+            Outside of academia, I&apos;m pretty artsy. I used to be a competitive pianist (Baroque, Classical, Romantic), senior national rhythmic gymnast, and competitive dancer (Chinese Ethnic Minority, Chinese Han, Ballet, Contemporary, Jazz, Tap).
           </p>
         </div>
       </div>

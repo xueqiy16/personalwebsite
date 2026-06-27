@@ -11,6 +11,7 @@ import Portal from "./Portal";
 import Character from "./Character";
 import CameraController from "./CameraController";
 import WalkablePath from "./WalkablePath";
+import SkyBackground from "./SkyBackground";
 
 // ── Responsive zoom — fit the monument on any screen ─────────────
 function useResponsiveZoom() {
@@ -144,9 +145,9 @@ export default function Scene() {
         powerPreference: "high-performance",
       }}
       dpr={[1, 1.5]}
-      style={{ background: "linear-gradient(180deg, #C8EDE8 0%, #FFF8D6 100%)" }}
       touch-action="none"
     >
+      <SkyBackground />
       <OrthographicCamera
         ref={cameraRef}
         makeDefault

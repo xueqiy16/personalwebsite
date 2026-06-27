@@ -4,6 +4,8 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+import BirdSpawner from "./Birds";
+
 /**
  * Sky environment — soft, fluffy white clouds that gently bob up and down.
  */
@@ -11,8 +13,10 @@ import * as THREE from "three";
 // Shared material props for cloud spheres
 const CLOUD_MAT = {
   color: "#FFFFFF" as const,
-  roughness: 1,
+  roughness: 0.95,
   metalness: 0,
+  emissive: "#FFFFFF" as const,
+  emissiveIntensity: 0.4,
 };
 
 // ===== Individual cloud (cluster of overlapping smooth spheres) =====
@@ -323,6 +327,7 @@ export default function Environment() {
       ))}
       <Stars />
       <ShootingStars />
+      <BirdSpawner />
     </group>
   );
 }
