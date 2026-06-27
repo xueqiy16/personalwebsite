@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
-import { useStore, type Section } from "@/store/useStore";
+import { useStore, type Section } from "../../store/useStore";
 import OverlayPanel from "./OverlayPanel";
-import { audio } from "@/lib/audio";
+import { audio } from "../../lib/audio";
 
 // =====================================================================
 //  PLACEHOLDER DATA

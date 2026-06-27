@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useStore } from "@/store/useStore";
-import { audio } from "@/lib/audio";
+import { useStore } from "../../store/useStore";
+import { audio } from "../../lib/audio";
 
 interface OverlayPanelProps {
   title: string;

@@ -3,9 +3,9 @@
 import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { useStore, type Section } from "@/store/useStore";
-import { getNode, findPath } from "@/lib/pathfinding";
-import { audio } from "@/lib/audio";
+import { useStore, type Section } from "../../store/useStore";
+import { getNode, findPath } from "../../lib/pathfinding";
+import { audio } from "../../lib/audio";
 
 // ── Palette ──────────────────────────────────────────────────
 const COL = {

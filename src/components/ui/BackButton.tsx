@@ -1,8 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useStore } from "@/store/useStore";
-import { audio } from "@/lib/audio";
+import { useStore } from "../../store/useStore";
+import { audio } from "../../lib/audio";
 
 /**
  * A floating "Back" button that appears whenever the user has navigated

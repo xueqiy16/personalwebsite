@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from "react";
 import { Html } from "@react-three/drei";
-import { useStore, type Section } from "@/store/useStore";
-import { audio } from "@/lib/audio";
-import { findPath, PORTAL_DEST } from "@/lib/pathfinding";
+import { useStore, type Section } from "../../store/useStore";
+import { audio } from "../../lib/audio";
+import { findPath, PORTAL_DEST } from "../../lib/pathfinding";
 
 interface PortalProps {
   /** Position in monument-space */

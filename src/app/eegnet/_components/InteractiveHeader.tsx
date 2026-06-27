@@ -220,13 +220,13 @@ export default function InteractiveHeader() {
 
       {/* Text overlay — pointer-events-none so canvas interactions work */}
       <div className="relative z-10 pointer-events-none max-w-3xl px-6 md:px-12 text-center">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight text-slate-900 mb-6">
-          Understanding EEGNet: A NumPy-only implementation for P300 ERP detection
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight mb-6">
+          Understanding EEGNet: A Numpy-only implementation for P300 ERP detection
         </h1>
         <p className="text-base sm:text-lg leading-relaxed text-slate-500 max-w-2xl mx-auto">
-          The purpose of this article is to investigate how the EEGNet convolutional neural network works.
-          The <a href="https://github.com/xueqiy16/eegnet-/tree/main" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 pointer-events-auto">corresponding code</a> for this project will be explained in an interactive, step-by-step methodology.
-          This implementation was created to be educational and fun.
+          The purpose of this interactive article is to break down the backend of EEGNet.
+          The <a href="https://github.com/xueqiy16/eegnet-/tree/main" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 pointer-events-auto">corresponding code</a> for this project will be explained.
+          Have fun!
         </p>
       </div>
     </header>

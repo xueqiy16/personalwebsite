@@ -2,15 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
-import SplashScreen from "@/components/ui/SplashScreen";
-import OverlayManager from "@/components/ui/OverlayManager";
-import MuteToggle from "@/components/ui/MuteToggle";
-import Acknowledgements from "@/components/ui/Acknowledgements";
-import { useStore } from "@/store/useStore";
-import { audio } from "@/lib/audio";
+import SplashScreen from "../components/ui/SplashScreen";
+import OverlayManager from "../components/ui/OverlayManager";
+import MuteToggle from "../components/ui/MuteButton";
+import Acknowledgements from "../components/ui/Acknowledgements";
+import { useStore } from "../store/useStore";
+import { audio } from "../lib/audio";
 
 // Dynamically import the 3D scene with SSR disabled (Three.js requires the DOM)
-const Scene = dynamic(() => import("@/components/3d/Scene"), { ssr: false });
+const Scene = dynamic(() => import("../components/3d/Scene"), { ssr: false });
 
 /** How long the splash stays visible before starting to fade out (ms) */
 const SPLASH_DISPLAY_MS = 2800;

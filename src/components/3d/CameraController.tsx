@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import * as THREE from "three";
-import { useStore, type Section } from "@/store/useStore";
+import { useStore, type Section } from "../../store/useStore";
 
 const CAMERA_TARGETS: Record<
   Section,

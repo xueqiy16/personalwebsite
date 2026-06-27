@@ -3,8 +3,8 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useStore } from "@/store/useStore";
-import { getNode } from "@/lib/pathfinding";
+import { useStore } from "../../store/useStore";
+import { getNode } from "../../lib/pathfinding";
 
 /**
  * Renders glowing dots along the active walk path.

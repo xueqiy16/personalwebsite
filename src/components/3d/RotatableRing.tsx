@@ -4,8 +4,8 @@ import { useRef, useState, useCallback } from "react";
 import { useFrame, useThree, ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import gsap from "gsap";
-import { useStore } from "@/store/useStore";
-import { audio } from "@/lib/audio";
+import { useStore } from "../../store/useStore";
+import { audio } from "../../lib/audio";
 
 // ── Palette (mirrors Monument.tsx) ──────────────────────────
 const C = {
